@@ -11,6 +11,6 @@ const char gprsPass[] = "";
 // Your endpoint server details
 const char server[] = "yourhost.yourdomain.com";
 const char resource[] = "/your-endpoint";
-const int  port = 80;'''
-
+const int  port = 80;
+```
 There are several other parameters that can easily be tweaked and adjusted for your application.
