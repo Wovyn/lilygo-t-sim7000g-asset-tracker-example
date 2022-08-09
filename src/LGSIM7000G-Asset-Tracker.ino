@@ -42,7 +42,7 @@
 #define GSM_PIN ""
 
 // Your GPRS/Cellular APN and credentials, if any
-const char apn[]  = "super";
+const char apn[]  = "";
 const char gprsUser[] = "";
 const char gprsPass[] = "";
 
