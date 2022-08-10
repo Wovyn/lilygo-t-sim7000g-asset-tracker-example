@@ -1,7 +1,7 @@
 /**************************************************************************************
  * 
  *  Lilygo T-SIM7000G Tracker Example
- *  Version 2.3
+ *  Version 2.4
  *  Last updated 2022-08-10
  *  Written by Scott C. Lemon
  *  Based on Lilygo Sample Code
@@ -42,14 +42,14 @@
 #define GSM_PIN ""
 
 // Your GPRS/Cellular APN and credentials, if any
-const char apn[]  = "super";
+const char apn[]  = "";
 const char gprsUser[] = "";
 const char gprsPass[] = "";
 
 // Your endpoint server details
 const char server[] = "";
-const char resource[] = "/lgtest-2";
-const int  port = 1880;
+const char resource[] = "";
+const int  port = 80;
 
 #include <TinyGsmClient.h>
 #include <ArduinoHttpClient.h>
@@ -357,6 +357,7 @@ void loop()
           DBG("Waiting for GPS lock ...");
           noLockCount++;
           DBG("noLockCount = ", noLockCount);
+          DBG("Delay in seconds = ", noLockCount * 2);
           // if it's been 2 minutes ... reset the GPS!
           if (noLockCount > 60) {
                 noLockCount = 0;
