@@ -1,8 +1,8 @@
 /**************************************************************************************
  * 
  *  Lilygo T-SIM7000G Tracker Example
- *  Version 2.2
- *  Last updated 2022-08-09
+ *  Version 2.3
+ *  Last updated 2022-08-10
  *  Written by Scott C. Lemon
  *  Based on Lilygo Sample Code
  * 
@@ -42,14 +42,14 @@
 #define GSM_PIN ""
 
 // Your GPRS/Cellular APN and credentials, if any
-const char apn[]  = "";
+const char apn[]  = "super";
 const char gprsUser[] = "";
 const char gprsPass[] = "";
 
 // Your endpoint server details
-const char server[] = "yourhost.yourdomain.com";
-const char resource[] = "/your-endpoint";
-const int  port = 80;
+const char server[] = "";
+const char resource[] = "/lgtest-2";
+const int  port = 1880;
 
 #include <TinyGsmClient.h>
 #include <ArduinoHttpClient.h>
@@ -342,8 +342,8 @@ void loop()
       DBG("Signal quality:", csq);
   
       // check GPS and get our GPS data
+      int noLockCount = 0;
       while (1) {
-        int noLockCount = 0;
         if (modem.getGPS(&lat2, &lon2, &speed2, &alt2, &vsat2, &usat2, &accuracy2,
                       &year2, &month2, &day2, &hour2, &min2, &sec2)) {
           DBG("Latitude:", String(lat2, 8), "\tLongitude:", String(lon2, 8));
@@ -356,8 +356,10 @@ void loop()
         } else {
           DBG("Waiting for GPS lock ...");
           noLockCount++;
+          DBG("noLockCount = ", noLockCount);
           // if it's been 2 minutes ... reset the GPS!
           if (noLockCount > 60) {
+                noLockCount = 0;
                 DBG("Reset GPS ... powering down ...");
                 // Set SIM7000G GPIO4 LOW ,turn off GPS power
                 // CMD:AT+SGPIO=0,4,1,0
