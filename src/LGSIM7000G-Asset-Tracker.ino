@@ -1,7 +1,7 @@
 /**************************************************************************************
  * 
  *  Lilygo T-SIM7000G Tracker Example
- *  Version 2.4
+ *  Version 2.5
  *  Last updated 2022-08-10
  *  Written by Scott C. Lemon
  *  Based on Lilygo Sample Code
@@ -70,21 +70,36 @@ HttpClient http(client, server, port);
 
 
 #define uS_TO_S_FACTOR 1000000ULL   /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP     600       /* Time ESP32 will go to sleep (in seconds) */
-#define POWER_DOWN_DELAY  180       /* Time ESP32 will delay before power down (in seconds) */
-#define TRANSMIT_INTERVAL 120       /* How often should the tracker transmit the current location */
+#define TIME_TO_SLEEP       600     /* Time ESP32 will go to sleep (in seconds) */
+#define POWER_DOWN_DELAY    180     /* Time ESP32 will delay before power down (in seconds) */
+#define TRANSMIT_INTERVAL   120     /* How often should the tracker transmit the current location */
+#define GPS_NO_LOCK_DELAY   2       /* How long to wait, looping to regain GPS lock, in seconds */
+#define GPS_NO_LOCK_TIMEOUT 60      /* How long to wait, total, before resetting the GPS power */
 
+// pins for the modem connection
 #define UART_BAUD   115200
 #define PIN_DTR     25
 #define PIN_TX      27
 #define PIN_RX      26
 #define PWR_PIN     4
 
+// pins for the SD Card slot
 #define SD_MISO     2
 #define SD_MOSI     15
 #define SD_SCLK     14
 #define SD_CS       13
 #define LED_PIN     12
+
+// Modem Network Modes
+#define NM_AUTOMATIC     2
+#define NM_GSM_ONLY     13
+#define NM_LTE_ONLY     38
+#define NM_GSM_AND_LTE  51
+
+// Modem Preferred Modes (Category of Service)
+#define PM_CAT_M            1
+#define PM_NB_IOT           2
+#define PM_CAT_M_AND_NB_IOT 3
 
 // variables ...
 float lat,  lon;
@@ -180,16 +195,16 @@ void setup()
  **************************************************************************************
  *
  *  Set Network mode:
- *     2 Automatic
- *    13 GSM only
- *    38 LTE only
- *    51 GSM and LTE only
+ *    NM_AUTOMATIC     2
+ *    NM_GSM_ONLY     13
+ *    NM_LTE_ONLY     38
+ *    NM_GSM_AND_LTE  51
  *    
  **************************************************************************************/
     bool boolRes;
     DBG("Setting network mode ...");
     do {
-        boolRes = modem.setNetworkMode(51);
+        boolRes = modem.setNetworkMode(NM_GSM_AND_LTE);
         delay(1000);
     } while (boolRes != true);
     DBG("... done!");
@@ -197,15 +212,15 @@ void setup()
 /**************************************************************************************
  * 
  *  Set Preferred mode:
- *    1 CAT-M
- *    2 NB-Iot
- *    3 CAT-M and NB-IoT
+ *    PM_CAT_M            1
+ *    PM_NB_IOT           2
+ *    PM_CAT_M_AND_NB_IOT 3
  *    
  **************************************************************************************/
     DBG("Setting Cat-M only ...");
     
     do {
-        boolRes = modem.setPreferredMode(1);
+        boolRes = modem.setPreferredMode(PM_CAT_M);
         delay(1000);
     } while (boolRes != true);
     DBG("... done!");
@@ -291,8 +306,7 @@ void loop()
       // delay here just to slow loop and print dots ...
       dotCounter++;
       if (dotCounter == DOT_EVERY_SECONDS) {
-        Serial.println("Transmit every: " + String(TRANSMIT_INTERVAL) + "  Waited " + String(DOT_EVERY_SECONDS) + " seconds ...");
-        //DBG("Waited 30 seconds ...");
+        Serial.println("Transmit every: " + String(TRANSMIT_INTERVAL) + " seconds.  Waited " + String(DOT_EVERY_SECONDS) + " seconds ...");
         dotCounter = 0;
       }
       delay(1000);
@@ -355,11 +369,10 @@ void loop()
           break;
         } else {
           DBG("Waiting for GPS lock ...");
-          noLockCount++;
-          DBG("noLockCount = ", noLockCount);
-          DBG("Delay in seconds = ", noLockCount * 2);
+          noLockCount += GPS_NO_LOCK_DELAY;
+          DBG("Delay in seconds = ", noLockCount);
           // if it's been 2 minutes ... reset the GPS!
-          if (noLockCount > 60) {
+          if (noLockCount > GPS_NO_LOCK_TIMEOUT) {
                 noLockCount = 0;
                 DBG("Reset GPS ... powering down ...");
                 // Set SIM7000G GPIO4 LOW ,turn off GPS power
@@ -380,12 +393,10 @@ void loop()
                 }
                 modem.enableGPS();
                 DBG("... done!");
-          }
-          //Serial.print("getGPS ");
-          //Serial.println(millis());
-        }
-        delay(2000);
-      }
+          } // end if (noLockCount > GPS_NO_LOCK_TIMEOUT)
+        } // else wait or reset GPS
+        delay(GPS_NO_LOCK_DELAY * 1000);
+      } // while forever waiting for GPS lock
 
       // transform and adjust data values
       //
