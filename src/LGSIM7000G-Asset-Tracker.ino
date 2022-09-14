@@ -42,13 +42,13 @@
 #define GSM_PIN ""
 
 // Your GPRS/Cellular APN and credentials, if any
-const char apn[]  = "";
-const char gprsUser[] = "";
-const char gprsPass[] = "";
+const char apn[]  = "";         // for Twilio Super SIM this is "super"
+const char gprsUser[] = "";     // for Twilio Super SIM this is left empty
+const char gprsPass[] = "";     // for Twilio Super SIM this is left empty
 
 // Your endpoint server details
-const char server[] = "";
-const char resource[] = "";
+const char server[] = "";       // for example: "yourhost.yourdomain.com"
+const char resource[] = "";     // for example: "/your-endpoint"
 const int  port = 80;
 
 #include <TinyGsmClient.h>
