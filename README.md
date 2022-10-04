@@ -1,7 +1,15 @@
 # lilygo-t-sim7000g-asset-tracker-example
 This is a simple example for using the Lilygo T-SIM7000G as an asset tracker.
 
-To use this code you need to set several parameters in the code:
+The sketch is using the following libraries that will have to be installed:
+
+TinyGSM for Cellular Modem support - https://github.com/vshymanskyy/TinyGSM
+ArduinoMQTTClient for MQTT Broker support - https://github.com/arduino-libraries/ArduinoMqttClient
+ArduinoHTTPClient for HTTP support - https://github.com/arduino-libraries/ArduinoHttpClient
+
+You can search for these libraries in the Arduino IDE Library Manager.
+
+To use this code you also need to set several parameters in the code:
 
 ```/*
  * Your cellular definitions
