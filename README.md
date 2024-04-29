@@ -11,7 +11,8 @@ You can search for these libraries in the Arduino IDE Library Manager.
 
 To use this code you also need to set several parameters in the code:
 
-```/*
+```
+/*
  * Your cellular definitions
  *   - You must provide your GPRS/Cellular APN and credentials, if any
  */
